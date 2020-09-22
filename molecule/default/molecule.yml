@@ -1,0 +1,47 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: centos7
+    image: geerlingguy/docker-centos7-ansible
+    pre_build_image: true
+  - name: centos8
+    image: geerlingguy/docker-centos8-ansible
+    pre_build_image: true
+  - name: ubuntu1804
+    image: geerlingguy/docker-ubuntu1804-ansible
+    pre_build_image: true
+  - name: ubuntu1604
+    image: geerlingguy/docker-ubuntu1604-ansible
+    pre_build_image: true
+  - name: ubuntu2004
+    image: geerlingguy/docker-ubuntu2004-ansible
+    pre_build_image: true
+  - name: debian9
+    image: geerlingguy/docker-debian9-ansible
+    pre_build_image: true
+  - name: debian10
+    image: geerlingguy/docker-debian10-ansible
+    pre_build_image: true
+  - name: fedora31
+    image: geerlingguy/docker-fedora31-ansible
+    pre_build_image: true
+  - name: fedora32
+    image: geerlingguy/docker-fedora32-ansible
+    pre_build_image: true
+  - name: archlinux
+    image: archlinux:latest
+    pre_build_image: true
+  - name: opensuseleap15
+    image: opensuse/leap:15.2
+    pre_build_image: true
+  - name: opensusetumbleweed
+    image: opensuse/tumbleweed:latest
+    pre_build_image: true
+provisioner:
+  name: ansible
+  log: true
+verifier:
+  name: ansible

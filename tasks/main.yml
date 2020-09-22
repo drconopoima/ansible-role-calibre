@@ -1,0 +1,51 @@
+---
+
+- name: "Install Calibre on CentOS/RedHat distributions"
+  block:
+    - name: "Add EPEL repository to Yum"
+      yum:
+        name: "epel-release"
+        state: "present"
+        update_cache: true
+    - name: "Add package Calibre via Yum"
+      yum:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+  when: (ansible_distribution == "CentOS") or (ansible_distribution == "Red Hat Enterprise Linux")
+
+- name: "Install Calibre on Debian Family distributions"
+  block:
+    - name: "Add package Calibre via APT"
+      apt:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+  when: (ansible_os_family == "Debian")
+  
+- name: "Install Calibre on Fedora distributions"
+  block:
+    - name: "Add package Calibre via DNF"
+      dnf:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+  when: (ansible_distribution == "Fedora")
+
+- name: "Install Calibre on Arch Linux family distributions"
+  block:
+    - name: "Add package Calibre via Pacman"
+      pacman:
+        name: "Calibre"
+        state: "present"
+        update_cache: true
+  when: (ansible_os_family == "Archlinux")
+
+- name: "Install Calibre on Suse family distributions"
+  block:
+    - name: "Add package Calibre via Zypper"
+      zypper:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+  when: (ansible_os_family == "Suse")
