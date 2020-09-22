@@ -36,7 +36,7 @@
   block:
     - name: "Add package Calibre via Pacman"
       pacman:
-        name: "Calibre"
+        name: "calibre"
         state: "present"
         update_cache: true
   when: (ansible_os_family == "Archlinux")
