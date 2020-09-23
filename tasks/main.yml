@@ -1,51 +1,64 @@
 ---
 
-- name: "Install Calibre on CentOS/RedHat distributions"
+- name: "Install Calibre"
   block:
-    - name: "Add EPEL repository to Yum"
-      yum:
-        name: "epel-release"
-        state: "present"
-        update_cache: true
-    - name: "Add package Calibre via Yum"
+    - name: "CentOS/RedHat: Add package Calibre via Yum"
       yum:
         name: "calibre"
         state: "present"
         update_cache: true
-  when: (ansible_distribution == "CentOS") or (ansible_distribution == "Red Hat Enterprise Linux")
-
-- name: "Install Calibre on Debian Family distributions"
-  block:
-    - name: "Add package Calibre via APT"
+      register: _yum_install
+      async: 600
+      poll: 0
+      when: (ansible_distribution == "CentOS") or (ansible_distribution == "Red Hat Enterprise Linux")
+    - name: "Debian/Ubuntu: Add package Calibre via APT"
       apt:
         name: "calibre"
         state: "present"
         update_cache: true
-  when: (ansible_os_family == "Debian")
-  
-- name: "Install Calibre on Fedora distributions"
-  block:
-    - name: "Add package Calibre via DNF"
+      register: _apt_install
+      async: 600
+      poll: 0
+      when: (ansible_os_family == "Debian")
+    - name: "Fedora: Add package Calibre via DNF"
       dnf:
         name: "calibre"
         state: "present"
         update_cache: true
-  when: (ansible_distribution == "Fedora")
-
-- name: "Install Calibre on Arch Linux family distributions"
-  block:
-    - name: "Add package Calibre via Pacman"
+      register: _dnf_install
+      async: 600
+      poll: 0
+      when: (ansible_distribution == "Fedora")
+    - name: "Arch: Add package Calibre via Pacman"
       pacman:
         name: "calibre"
         state: "present"
         update_cache: true
-  when: (ansible_os_family == "Archlinux")
-
-- name: "Install Calibre on Suse family distributions"
-  block:
-    - name: "Add package Calibre via Zypper"
+      register: _pacman_install
+      async: 600
+      poll: 0
+      when: (ansible_os_family == "Archlinux")
+    - name: "Suse: Add package Calibre via Zypper"
       zypper:
         name: "calibre"
         state: "present"
         update_cache: true
-  when: (ansible_os_family == "Suse")
+      register: _zypper_install
+      async: 600
+      poll: 0
+      when: (ansible_os_family == "Suse")
+
+    - name: Wait for package installation to finish
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: _jobs
+      until: _jobs.finished
+      delay: 5  # Check every 5 seconds. Adjust as you like.
+      retries: 120  # Retry up to 120 times. Adjust as needed.
+      with_items:
+        - "{{ _apt_install }}"
+        - "{{ _dnf_install }}"
+        - "{{ _zypper_install }}"
+        - "{{ _pacman_install }}"
+        - "{{ _yum_install }}"
+      when: item.ansible_job_id is defined
