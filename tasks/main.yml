@@ -51,11 +51,11 @@
     - name: Wait for package installation to finish
       async_status:
         jid: "{{ item.ansible_job_id }}"
-      register: _jobs
-      until: _jobs.finished
+      register: _install_results
+      until: _install_results.finished is defined and _install_results.finished
       delay: 5  # Check every 5 seconds. Adjust as you like.
       retries: 120  # Retry up to 120 times. Adjust as needed.
-      with_items:
+      loop:
         - "{{ _apt_install }}"
         - "{{ _dnf_install }}"
         - "{{ _zypper_install }}"
