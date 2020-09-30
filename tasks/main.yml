@@ -4,10 +4,8 @@
   block:
     - name: "CentOS/RedHat: Uninstall old Calibre versions."
       yum:
-        name:
-            - calibre
+        name: calibre
         state: absent
-        update_cache: false
       register: _yum_uninstall
       async: 600
       poll: 0
@@ -15,10 +13,8 @@
 
     - name: "Debian/Ubuntu: Uninstall old Calibre versions."
       apt:
-        name:
-          - calibre
+        name: calibre
         state: absent
-        update_cache: false
       register: _apt_uninstall
       async: 600
       poll: 0
@@ -26,10 +22,8 @@
 
     - name: "Arch: Uninstall old Calibre versions."
       pacman:
-        name:
-          - calibre
+        name: calibre
         state: absent
-        update_cache: false
       register: _pacman_uninstall
       async: 600
       poll: 0
@@ -37,10 +31,8 @@
 
     - name: "Fedora: Uninstall old Calibre versions."
       dnf:
-        name:
-            - calibre
+        name: calibre
         state: absent
-        update_cache: false
       register: _dnf_uninstall
       async: 600
       poll: 0
@@ -48,10 +40,8 @@
     
     - name: "Suse: Uninstall old Calibre versions."
       zypper:
-        name:
-            - calibre
+        name: calibre
         state: absent
-        update_cache: false
       register: _zypper_uninstall
       async: 600
       poll: 0
@@ -76,7 +66,7 @@
   block:
     - name: "CentOS/RedHat: Add package Calibre via Yum"
       yum:
-        name: "calibre"
+        name: calibre
         state: present
         update_cache: true
       register: _yum_install
@@ -85,7 +75,7 @@
       when: (ansible_distribution == "CentOS") or (ansible_distribution == "Red Hat Enterprise Linux")
     - name: "Debian/Ubuntu: Add package Calibre via APT"
       apt:
-        name: "calibre"
+        name: calibre
         state: present
         update_cache: true
       register: _apt_install
@@ -94,7 +84,7 @@
       when: ansible_os_family == "Debian"
     - name: "Fedora: Add package Calibre via DNF"
       dnf:
-        name: "calibre"
+        name: calibre
         state: present
         update_cache: true
       register: _dnf_install
@@ -103,7 +93,7 @@
       when: ansible_distribution == "Fedora"
     - name: "Arch: Add package Calibre via Pacman"
       pacman:
-        name: "calibre"
+        name: calibre
         state: present
         update_cache: true
       register: _pacman_install
@@ -112,7 +102,7 @@
       when: ansible_os_family == "Archlinux"
     - name: "Suse: Add package Calibre via Zypper"
       zypper:
-        name: "calibre"
+        name: calibre
         state: present
         update_cache: true
       register: _zypper_install
