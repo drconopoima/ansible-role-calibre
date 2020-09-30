@@ -1,11 +1,83 @@
 ---
 
+- name: "Setup: Uninstall old versions and ensure dependencies"
+  block:
+    - name: "CentOS/RedHat: Uninstall old Calibre versions."
+      yum:
+        name:
+            - calibre
+        state: absent
+        update_cache: false
+      register: _yum_uninstall
+      async: 600
+      poll: 0
+      when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+
+    - name: "Debian/Ubuntu: Uninstall old Calibre versions."
+      apt:
+        name:
+          - calibre
+        state: absent
+        update_cache: false
+      register: _apt_uninstall
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Debian"
+
+    - name: "Arch: Uninstall old Calibre versions."
+      pacman:
+        name:
+          - calibre
+        state: absent
+        update_cache: false
+      register: _pacman_uninstall
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Archlinux"
+
+    - name: "Fedora: Uninstall old Calibre versions."
+      dnf:
+        name:
+            - calibre
+        state: absent
+        update_cache: false
+      register: _dnf_uninstall
+      async: 600
+      poll: 0
+      when: ansible_distribution == "Fedora"
+    
+    - name: "Suse: Uninstall old Calibre versions."
+      zypper:
+        name:
+            - calibre
+        state: absent
+        update_cache: false
+      register: _zypper_uninstall
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Suse"
+
+    - name: Wait for package uninstall to finish
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: _uninstall_results
+      until: _uninstall_results.finished is defined and _uninstall_results.finished
+      delay: 5  # Check every 5 seconds. Adjust as you like.
+      retries: 120  # Retry up to 120 times. Adjust as needed.
+      loop:
+        - "{{ _apt_uninstall }}"
+        - "{{ _dnf_uninstall }}"
+        - "{{ _zypper_uninstall }}"
+        - "{{ _pacman_uninstall }}"
+        - "{{ _yum_uninstall }}"
+      when: item.ansible_job_id is defined
+
 - name: "Install Calibre"
   block:
     - name: "CentOS/RedHat: Add package Calibre via Yum"
       yum:
         name: "calibre"
-        state: "present"
+        state: present
         update_cache: true
       register: _yum_install
       async: 600
@@ -14,39 +86,39 @@
     - name: "Debian/Ubuntu: Add package Calibre via APT"
       apt:
         name: "calibre"
-        state: "present"
+        state: present
         update_cache: true
       register: _apt_install
       async: 600
       poll: 0
-      when: (ansible_os_family == "Debian")
+      when: ansible_os_family == "Debian"
     - name: "Fedora: Add package Calibre via DNF"
       dnf:
         name: "calibre"
-        state: "present"
+        state: present
         update_cache: true
       register: _dnf_install
       async: 600
       poll: 0
-      when: (ansible_distribution == "Fedora")
+      when: ansible_distribution == "Fedora"
     - name: "Arch: Add package Calibre via Pacman"
       pacman:
         name: "calibre"
-        state: "present"
+        state: present
         update_cache: true
       register: _pacman_install
       async: 600
       poll: 0
-      when: (ansible_os_family == "Archlinux")
+      when: ansible_os_family == "Archlinux"
     - name: "Suse: Add package Calibre via Zypper"
       zypper:
         name: "calibre"
-        state: "present"
+        state: present
         update_cache: true
       register: _zypper_install
       async: 600
       poll: 0
-      when: (ansible_os_family == "Suse")
+      when: ansible_os_family == "Suse"
 
     - name: Wait for package installation to finish
       async_status:
