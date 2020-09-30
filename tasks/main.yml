@@ -68,6 +68,7 @@
           - xdg-utils
           - xz-utils
           - wget
+          - sudo
           # - libstdc++6
         state: present
       register: _apt_dependencies_install
@@ -82,6 +83,7 @@
           - xz
           - xz-devel
           - wget
+          - sudo
           # - libstdc++-devel
         state: present
       register: _yum_dependencies_install
@@ -95,6 +97,7 @@
           - xdg-utils
           - xz
           - wget
+          - sudo
         state: present
       register: _pacman_dependencies_install
       async: 600
@@ -108,6 +111,8 @@
           - xz-devel
           - wget
           - xdg-utils
+          - sudo
+          - tar
         state: present
       register: _zypper_dependencies_install
       async: 600
@@ -120,6 +125,7 @@
           - xz
           - xz-devel
           - wget
+          - sudo
         state: present
       register: _dnf_dependencies_install
       async: 600
@@ -144,9 +150,11 @@
 - name: "Install Calibre"
   block:
     - name: Download Calibre Installer
+      run_once: true
+      delegate_to: localhost
       get_url:
         url: https://download.calibre-ebook.com/linux-installer.sh
-        dest: ${DEST_TEMP_INSTALL_SCRIPT:-"/tmp/linux-installer.sh"}
+        dest: /tmp/linux-installer.sh
         force: yes
       register: _urlDownload
 
@@ -155,7 +163,7 @@
         var: _urlDownload
     
     - name: Execute Calibre Install Script on Targets
-      script: ${DEST_TEMP_INSTALL_SCRIPT:-"/tmp/linux-installer.sh"}
+      script: "{{ _urlDownload.dest }}"
       become: true
       register: _install
 
