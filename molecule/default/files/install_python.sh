@@ -6,6 +6,7 @@ YUM_PACKAGE_NAME='python36';
 DNF_PACKAGE_NAME='python3';
 PACMAN_PACKAGE_NAME='python3';
 ZYPPER_PACKAGE_NAME='python3';
+EOPKG_PACKAGE_NAME='python3';
 
 # Debian/Ubuntu
 if command -v apt-get >/dev/null 2>&1; then
@@ -38,6 +39,11 @@ if command -v zypper >/dev/null 2>&1; then
   (ln -sf -T "/usr/bin/${ZYPPER_PACKAGE_NAME}" /usr/bin/python || true ) && \
   exit 0;
 fi
-
+# Solus
+if command -v eopkg >/dev/null 2>&1; then
+  eopkg install -y "${EOPKG_PACKAGE_NAME}" && \
+  (ln -sf -T "/usr/bin/${EOPKG_PACKAGE_NAME}" /usr/bin/python || true ) && \
+  exit 0;
+fi
 echo "ERROR: Cannot install python3 on destination"
 exit 1;

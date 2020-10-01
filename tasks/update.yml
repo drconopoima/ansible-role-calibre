@@ -1,0 +1,7 @@
+---
+
+- name: Update the Calibre package
+  package:
+    name: "calibre"
+    state: latest
+    update_cache: true

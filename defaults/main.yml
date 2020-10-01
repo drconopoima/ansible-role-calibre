@@ -1,2 +1,8 @@
 ---
 # defaults file for ansible-role-calibre.yml
+
+# Defines if Calibre should be uninstalled
+calibre_uninstall: false
+
+# Whether Calibre should be updated
+calibre_update: false
