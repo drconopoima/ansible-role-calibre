@@ -1,6 +1,56 @@
 ---
 
-- name: Remove the Calibre package
-  package:
-    name: "calibre"
-    state: absent
+- name: Uninstall Calibre
+  block:
+    - name: "Debian/Ubuntu: Remove the Calibre package via apt."
+      apt:
+        name: "calibre"
+        state: absent
+        autoremove: yes
+      register: _apt_uninstall
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Debian"
+
+    - name: "CentOS/RedHat: Remove the Calibre package via yum."
+      yum:
+        name: "calibre"
+        state: absent
+        autoremove: yes
+      register: _yum_uninstall
+      async: 600
+      poll: 0
+      when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+    
+    - name: "Fedora: Remove the Calibre package via dnf."
+      dnf:
+        name: "calibre"
+        state: absent
+        autoremove: no
+      register: _dnf_uninstall
+      async: 600
+      poll: 0
+      when: ansible_distribution == "Fedora"
+
+    - name: "Other: Remove the Calibre package."
+      package:
+        name: "calibre"
+        state: absent
+      register: _other_uninstall
+      async: 600
+      poll: 0
+      when: not ( ansible_os_family == "RedHat" ) and not ( ansible_os_family == "Debian" )
+
+    - name: Wait for package uninstall to finish
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: _uninstall_results
+      until: _uninstall_results.finished is defined and _uninstall_results.finished
+      delay: 5  # Check every 5 seconds. Adjust as you like.
+      retries: 120  # Retry up to 120 times. Adjust as needed.
+      loop:
+        - "{{ _apt_uninstall }}"
+        - "{{ _dnf_uninstall }}"
+        - "{{ _yum_uninstall }}"
+        - "{{ _other_uninstall }}"
+      when: item.ansible_job_id is defined
