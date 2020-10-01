@@ -1,0 +1,6 @@
+---
+
+- name: Remove the Calibre package
+  package:
+    name: "calibre"
+    state: absent

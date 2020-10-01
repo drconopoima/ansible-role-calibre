@@ -1,0 +1,73 @@
+---
+
+- name: "Install Calibre"
+  block:
+    - name: "CentOS/RedHat: Add package Calibre via Yum"
+      yum:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+      register: _yum_install
+      async: 600
+      poll: 0
+      when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+    - name: "Debian/Ubuntu: Add package Calibre via APT"
+      apt:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+      register: _apt_install
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Debian"
+    - name: "Fedora: Add package Calibre via DNF"
+      dnf:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+      register: _dnf_install
+      async: 600
+      poll: 0
+      when: ansible_distribution == "Fedora"
+    - name: "Arch: Add package Calibre via Pacman"
+      pacman:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+      register: _pacman_install
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Archlinux"
+    - name: "Suse: Add package Calibre via Zypper"
+      zypper:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+      register: _zypper_install
+      async: 600
+      poll: 0
+      when: ansible_os_family == "Suse"
+    - name: "Generic: Add package Calibre"
+      package:
+        name: "calibre"
+        state: "present"
+        update_cache: true
+      register: _generic_install
+      async: 600
+      poll: 0
+      when: not ( ansible_os_family == "RedHat" ) and not ( ansible_os_family == "Debian" ) and not ( ansible_os_family == "Suse" ) and not ( ansible_os_family == "Archlinux" )
+    - name: Wait for package installation to finish
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: _install_results
+      until: _install_results.finished is defined and _install_results.finished
+      delay: 5  # Check every 5 seconds. Adjust as you like.
+      retries: 120  # Retry up to 120 times. Adjust as needed.
+      loop:
+        - "{{ _apt_install }}"
+        - "{{ _dnf_install }}"
+        - "{{ _zypper_install }}"
+        - "{{ _pacman_install }}"
+        - "{{ _yum_install }}"
+        - "{{ _generic_install }}"
+      when: item.ansible_job_id is defined
